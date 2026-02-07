@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{{ word.french_word }} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}{{ word.french_word }}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="word-original">{% trans "Original" %}: {{ word.original_word }}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="word-badges-section">
+    {% if word.cefr_level %}
+    <span class="badge badge-{{ word.cefr_level|lower }}">CEFR: {{ word.get_cefr_level_display }}</span>
+    {% endif %}
+    <span class="badge badge-familiarity-{{ word.familiarity }}">{% trans "Familiarity" %}: {{ word.familiarity }}/5</span>
+</div>
+
+<div class="detail-sections">
+    <div class="glass-card detail-section">
+        <h2 class="section-title">{% trans "English Translation" %}</h2>
+        <p class="section-content">{{ word.english_translation }}</p>
+    </div>
+
+    <div class="glass-card detail-section">
+        <h2 class="section-title">{% trans "French Explanation" %}</h2>
+        <p class="section-content">{{ word.french_explanation }}</p>
+    </div>
+
+    <div class="glass-card detail-section">
+        <h2 class="section-title">{% trans "English Examples" %}</h2>
+        <ul class="example-list">
+            {% for example in english_examples %}
+            <li>{{ example }}</li>
+            {% empty %}
+            <li class="no-examples">{% trans "No examples available" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="glass-card detail-section">
+        <h2 class="section-title">{% trans "French Examples" %}</h2>
+        <ul class="example-list">
+            {% for example in french_examples %}
+            <li>{{ example }}</li>
+            {% empty %}
+            <li class="no-examples">{% trans "No examples available" %}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="action-buttons">
+    <a href="{% url 'word_list' %}" class="btn btn-secondary">{% trans "Back to Word List" %}</a>
+    <a href="{% url 'word_delete' word.id %}" class="btn btn-danger">{% trans "Delete Word" %}</a>
+</div>
+
+<div class="glass-card meta-card">
+    <p class="meta-text">
+        <strong>{% trans "Created" %}:</strong> {{ word.created_at|date:"F d, Y g:i A" }}<br>
+        <strong>{% trans "Last Updated" %}:</strong> {{ word.updated_at|date:"F d, Y g:i A" }}
+    </p>
+</div>
+{% endblock %}

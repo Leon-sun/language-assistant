@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete" %} {{ word.french_word }} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}{% trans "Delete Word" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+</div>
+
+<div class="glass-card warning-card danger">
+    <p class="warning-title">⚠️ {% trans "Warning" %}: {% trans "Are you sure you want to delete this word?" %}</p>
+    <p class="warning-text">
+        <strong>{{ word.french_word }}</strong> ({{ word.original_word }}) {% trans "will be permanently deleted." %}
+    </p>
+</div>
+
+<div class="glass-card info-card">
+    <h3 class="section-title">{% trans "Word Details" %}:</h3>
+    <div class="delete-info">
+        <p><strong>{% trans "French Word" %}:</strong> {{ word.french_word }}</p>
+        <p><strong>{% trans "Original Word" %}:</strong> {{ word.original_word }}</p>
+        <p><strong>{% trans "English Translation" %}:</strong> {{ word.english_translation|truncatewords:15 }}</p>
+        {% if word.cefr_level %}
+        <p><strong>{% trans "CEFR Level" %}:</strong> {{ word.get_cefr_level_display }}</p>
+        {% endif %}
+        <p><strong>{% trans "Familiarity" %}:</strong> {{ word.familiarity }}/5</p>
+    </div>
+</div>
+
+<form method="post" action="{% url 'word_delete' word.id %}" class="delete-form">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">{% trans "Yes, Delete Word" %}</button>
+    <a href="{% url 'word_detail' word.id %}" class="btn btn-secondary">{% trans "Cancel" %}</a>
+</form>
+{% endblock %}

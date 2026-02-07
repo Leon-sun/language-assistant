@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign In" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "Sign in to save words to your personal dictionary." %}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="auth-container">
+    <div class="glass-card auth-card">
+        <form method="post" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="messages">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <div class="message error">{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <div class="message error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="{{ form.login.id_for_label }}">{% trans "Nickname" %}</label>
+                {{ form.login }}
+                {% if form.login.help_text %}
+                <span class="help-text">{{ form.login.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+                {{ form.password }}
+                {% if form.password.help_text %}
+                <span class="help-text">{{ form.password.help_text }}</span>
+                {% endif %}
+                <small class="form-hint">{% trans "Password must be at least 6 characters long." %}</small>
+            </div>
+            
+            {% if form.remember %}
+            <div class="form-group checkbox-group">
+                <label>
+                    {{ form.remember }} {% trans "Remember me" %}
+                </label>
+            </div>
+            {% endif %}
+            
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary btn-block">{% trans "Sign In" %}</button>
+        </form>
+        
+        <div class="auth-divider">
+            <p class="auth-link-text">
+                {% trans "Don't have an account?" %} <a href="{% url 'account_signup' %}" class="link-accent">{% trans "Sign up" %}</a>
+            </p>
+            <p class="auth-link-text">
+                <a href="{% url 'account_reset_password' %}" class="link-accent">{% trans "Forgot password?" %}</a>
+            </p>
+        </div>
+        
+        {% load socialaccount %}
+        {% get_providers as socialaccount_providers %}
+        {% if socialaccount_providers %}
+        <div class="auth-divider">
+            <p class="auth-link-text">{% trans "Or sign in with" %}:</p>
+            <div class="social-buttons">
+                {% for provider in socialaccount_providers %}
+                    <a href="{% provider_login_url provider.id process='login' %}" class="btn btn-social">
+                        <span>🔵</span> {{ provider.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

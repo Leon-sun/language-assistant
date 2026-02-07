@@ -1,0 +1,136 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+{% get_current_language as CURRENT_LANGUAGE %}
+<html lang="{{ CURRENT_LANGUAGE }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "Dictionary Project" %}{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/docs-ui.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="topnav glass">
+        <div class="container topnav-inner">
+            <a href="{% url 'index' %}" class="brand">
+                <span class="brand-badge">D</span>
+                <span class="brand-name">{% trans "Dictionary Project" %}</span>
+            </a>
+
+            <div class="nav-right">
+                <ul class="nav-links">
+                    <li>
+                        <a href="{% url 'index' %}" class="{% if request.resolver_match.url_name == 'index' %}is-active{% endif %}">
+                            {% trans "Home" %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'word_lookup' %}" class="{% if request.resolver_match.url_name == 'word_lookup' %}is-active{% endif %}">
+                            {% trans "Lookup Word" %}
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'word_list' %}" class="{% if request.resolver_match.url_name == 'word_list' %}is-active{% endif %}">
+                            {% trans "Word List" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{% url 'stories' %}" class="{% if request.resolver_match.url_name == 'stories' %}is-active{% endif %}">
+                            {% trans "Stories" %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}is-active{% endif %}">
+                            {% trans "About" %}
+                        </a>
+                    </li>
+                </ul>
+
+                {% if user.is_authenticated %}
+                <a href="{% url 'profile_settings' %}" class="chip" style="text-decoration: none; cursor: pointer;">
+                    {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="Profile" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px; object-fit: cover;">
+                    {% endif %}
+                    <span>{% trans "Hello" %}, {% if user.profile and user.profile.nickname %}{{ user.profile.nickname }}{% else %}{{ user.username }}{% endif %}!</span>
+                </a>
+                <a href="{% url 'account_logout' %}" class="btn">{% trans "Sign Out" %}</a>
+                {% else %}
+                <a href="{% url 'account_login' %}" class="btn btn-primary">{% trans "Sign In" %}</a>
+                <a href="{% url 'account_signup' %}" class="btn">{% trans "Sign Up" %}</a>
+                {% endif %}
+
+                <div class="chip" style="gap: 6px;">
+                    <form action="{% url 'set_language' %}" method="post" style="display: inline; margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="hidden" name="language" value="en">
+                        <button type="submit" class="btn" style="padding: 6px 10px; border-radius: 999px; {% if CURRENT_LANGUAGE == 'en' or not CURRENT_LANGUAGE %}border-color: rgba(45,212,191,0.45);{% endif %}">EN</button>
+                    </form>
+                    <form action="{% url 'set_language' %}" method="post" style="display: inline; margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                        <input type="hidden" name="language" value="fr">
+                        <button type="submit" class="btn" style="padding: 6px 10px; border-radius: 999px; {% if CURRENT_LANGUAGE == 'fr' %}border-color: rgba(45,212,191,0.45);{% endif %}">FR</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="layout">
+        <div class="container">
+            <div class="grid">
+                <aside class="sidebar">
+                    <h2 class="section-title">{% trans "Sections" %}</h2>
+
+                    <a class="section-card {% if request.resolver_match.url_name == 'index' %}is-active{% endif %}" href="{% url 'index' %}">
+                        <h3>{% trans "Home" %}</h3>
+                        <p>{% trans "Overview and quick links." %}</p>
+                    </a>
+
+                    <a class="section-card {% if request.resolver_match.url_name == 'word_lookup' %}is-active{% endif %}" href="{% url 'word_lookup' %}">
+                        <h3>{% trans "Lookup Word" %}</h3>
+                        <p>{% trans "Context-aware vocabulary explanations." %}</p>
+                    </a>
+
+                    {% if user.is_authenticated %}
+                    <a class="section-card {% if request.resolver_match.url_name == 'word_list' %}is-active{% endif %}" href="{% url 'word_list' %}">
+                        <h3>{% trans "Word List" %}</h3>
+                        <p>{% trans "Your saved vocabulary." %}</p>
+                    </a>
+                    {% endif %}
+
+                    <a class="section-card {% if request.resolver_match.url_name == 'stories' %}is-active{% endif %}" href="{% url 'stories' %}">
+                        <h3>{% trans "Stories" %}</h3>
+                        <p>{% trans "Fresh headlines to read." %}</p>
+                    </a>
+
+                    <a class="section-card {% if request.resolver_match.url_name == 'about' %}is-active{% endif %}" href="{% url 'about' %}">
+                        <h3>{% trans "About" %}</h3>
+                        <p>{% trans "What this project is and why it exists." %}</p>
+                    </a>
+                </aside>
+
+                <section class="panel glass-strong">
+                    <div class="panel-header">
+                        <h1 class="panel-title">{% block page_title %}{% trans "Dictionary Project" %}{% endblock %}</h1>
+                        <div class="accent-bar"></div>
+                    </div>
+                    {% block content %}{% endblock %}
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 {% trans "Dictionary Project" %}. {% trans "Built with Django" %}.</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

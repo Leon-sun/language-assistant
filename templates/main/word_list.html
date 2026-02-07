@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Word List" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}📖 {% trans "Word List" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "View and manage your saved words." %}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Filters -->
+<div class="glass-card filter-card">
+    <form method="get" action="{% url 'word_list' %}" class="filter-form">
+        <div class="form-group inline-group">
+            <label for="cefr_level">{% trans "CEFR Level" %}:</label>
+            <select name="cefr_level" id="cefr_level" class="form-select">
+                <option value="">{% trans "All" %}</option>
+                <option value="A1" {% if cefr_filter == 'A1' %}selected{% endif %}>A1 - {% trans "Beginner" %}</option>
+                <option value="A2" {% if cefr_filter == 'A2' %}selected{% endif %}>A2 - {% trans "Elementary" %}</option>
+                <option value="B1" {% if cefr_filter == 'B1' %}selected{% endif %}>B1 - {% trans "Intermediate" %}</option>
+                <option value="B2" {% if cefr_filter == 'B2' %}selected{% endif %}>B2 - {% trans "Upper Intermediate" %}</option>
+                <option value="C1" {% if cefr_filter == 'C1' %}selected{% endif %}>C1 - {% trans "Advanced" %}</option>
+                <option value="C2" {% if cefr_filter == 'C2' %}selected{% endif %}>C2 - {% trans "Proficient" %}</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">{% trans "Filter" %}</button>
+        <a href="{% url 'word_list' %}" class="btn btn-secondary">{% trans "Clear" %}</a>
+    </form>
+</div>
+
+<!-- Word List -->
+{% if words %}
+<div class="words-container">
+    <h2 class="section-title">{% trans "Saved Words" %} ({{ words.count }})</h2>
+    <div class="word-grid">
+        {% for word in words %}
+        <div class="glass-card word-card">
+            <div class="word-card-header">
+                <div class="word-title-section">
+                    <h3 class="word-title-link">
+                        <a href="{% url 'word_detail' word.id %}">{{ word.french_word }}</a>
+                    </h3>
+                    <p class="word-original">{% trans "Original" %}: {{ word.original_word }}</p>
+                </div>
+                <div class="word-badges">
+                    {% if word.cefr_level %}
+                    <span class="badge badge-{{ word.cefr_level|lower }}">CEFR: {{ word.get_cefr_level_display }}</span>
+                    {% endif %}
+                    <span class="badge badge-familiarity-{{ word.familiarity }}">{% trans "Familiarity" %}: {{ word.familiarity }}/5</span>
+                </div>
+            </div>
+            
+            <div class="word-preview">
+                <p><strong>{% trans "English" %}:</strong> {{ word.english_translation|truncatewords:20 }}</p>
+                <p><strong>{% trans "French" %}:</strong> {{ word.french_explanation|truncatewords:20 }}</p>
+            </div>
+            
+            <div class="word-actions">
+                <a href="{% url 'word_detail' word.id %}" class="btn btn-sm btn-primary">{% trans "View Details" %}</a>
+                <a href="{% url 'word_delete' word.id %}" class="btn btn-sm btn-danger">{% trans "Delete" %}</a>
+            </div>
+            
+            <p class="word-date">{% trans "Saved on" %} {{ word.created_at|date:"M d, Y" }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="glass-card empty-state">
+    <p class="empty-text">{% trans "No words saved yet." %}</p>
+    <a href="{% url 'word_lookup' %}" class="btn btn-primary">{% trans "Lookup Your First Word" %}</a>
+</div>
+{% endif %}
+{% endblock %}

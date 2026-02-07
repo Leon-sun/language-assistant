@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Word Lookup" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}🔍 {% trans "Word Lookup" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "Enter a French or English word to get its translation, explanation, and usage examples." %}</p>
+</div>
+
+{% if not user.is_authenticated %}
+<div class="glass-card warning-card">
+    <p>⚠️ {% trans "You can look up words without signing in, but you need to sign in to save words to your personal dictionary." %}</p>
+</div>
+{% endif %}
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Word Lookup Form -->
+<div class="glass-card form-card">
+    <h2 class="section-title">{% trans "Translate Word" %}</h2>
+    <form method="post" action="{% url 'word_lookup' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ lookup_form.word.label_tag }}
+            {{ lookup_form.word }}
+            {% if lookup_form.word.help_text %}
+            <span class="help-text">{{ lookup_form.word.help_text }}</span>
+            {% endif %}
+        </div>
+        <button type="submit" name="lookup_word" class="btn btn-primary">{% trans "Lookup Word" %}</button>
+    </form>
+</div>
+
+<!-- Word Results -->
+{% if word_data %}
+<div class="glass-card result-card">
+    <div class="result-header">
+        <h2 class="section-title">{% trans "Word Lookup Results" %}</h2>
+    </div>
+    
+    <div class="word-info">
+        <h3 class="word-title">
+            {{ word_data.base_form }}
+            {% if word_data.gender %}
+            <span class="gender-badge">({{ word_data.gender }})</span>
+            {% endif %}
+        </h3>
+        {% if word_data.input_word and word_data.input_word != word_data.base_form %}
+        <p class="word-input">{% trans "Input" %}: {{ word_data.input_word }}</p>
+        {% elif word_data.original_word and word_data.original_word != word_data.base_form %}
+        <p class="word-input">{% trans "Input" %}: {{ word_data.original_word }}</p>
+        {% endif %}
+        <div class="word-meta">
+            {% if word_data.part_of_speech %}
+            <span class="meta-tag">{% trans "Part of speech" %}: <strong>{{ word_data.part_of_speech }}</strong></span>
+            {% endif %}
+            {% if word_data.cefr_level %}
+            <span class="badge badge-{{ word_data.cefr_level|lower }}">CEFR: {{ word_data.cefr_level }}</span>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if word_data.explanation_native %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Explanation" %}:</h4>
+        <p class="info-content">{{ word_data.explanation_native }}</p>
+    </div>
+    {% elif word_data.personalized_explanation %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Personalized Explanation" %}:</h4>
+        <p class="info-content">{{ word_data.personalized_explanation }}</p>
+    </div>
+    {% elif word_data.definition_en %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Definition" %}:</h4>
+        <p class="info-content">{{ word_data.definition_en }}</p>
+    </div>
+    {% endif %}
+    
+    {% if word_data.conversation_target %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Context Conversation" %}:</h4>
+        <p class="info-content conversation-text">{{ word_data.conversation_target }}</p>
+    </div>
+    {% elif word_data.conversation_fr %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Context Conversation" %}:</h4>
+        <p class="info-content conversation-text">{{ word_data.conversation_fr }}</p>
+    </div>
+    {% endif %}
+    
+    {% if word_data.selected_interest %}
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Selected Interest Context" %}:</h4>
+        <p class="info-content"><span class="interest-badge">{{ word_data.selected_interest }}</span></p>
+    </div>
+    {% endif %}
+    
+    <div class="info-section">
+        <h4 class="info-title">{% trans "Usage Examples" %}:</h4>
+        <ul class="example-list">
+            {% for usage in word_data.usages_target %}
+            {% if usage %}
+            <li>{{ usage }}</li>
+            {% endif %}
+            {% empty %}
+            {% for usage in word_data.usages_fr %}
+            {% if usage %}
+            <li>{{ usage }}</li>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'word_lookup' %}" id="save-word-form" class="save-form">
+        {% csrf_token %}
+        <input type="hidden" name="word_data" id="word-data-input">
+        <button type="submit" name="save_word" class="btn btn-primary">💾 {% trans "Save Word" %}</button>
+    </form>
+    {% else %}
+    <div class="glass-card info-card">
+        <p>
+            {% trans "Sign in to save this word to your personal dictionary." %}
+            <a href="{% url 'account_login' %}" class="link-accent">{% trans "Sign In" %}</a> | 
+            <a href="{% url 'account_signup' %}" class="link-accent">{% trans "Sign Up" %}</a>
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if word_data %}
+{{ word_data|json_script:"word-data-json" }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const wordDataElement = document.getElementById('word-data-json');
+        if (wordDataElement) {
+            const wordData = JSON.parse(wordDataElement.textContent);
+            const form = document.getElementById('save-word-form');
+            if (form) {
+                const hiddenInput = document.getElementById('word-data-input');
+                if (hiddenInput) {
+                    hiddenInput.value = JSON.stringify(wordData);
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}

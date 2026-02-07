@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Stories" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}📰 {% trans "Stories from Le Monde" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "Latest articles from Le Monde RSS feeds - First 3 titles from each category." %}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Save Articles Button -->
+<form method="post" action="{% url 'stories' %}" class="action-form">
+    {% csrf_token %}
+    <button type="submit" name="save_articles" class="btn btn-primary">💾 {% trans "Save All Articles to Database" %}</button>
+</form>
+
+<!-- Stories by Feed -->
+<div class="stories-container">
+    {% for rss_url, feed_data in stories_by_feed.items %}
+    <div class="glass-card feed-card">
+        <h2 class="feed-title">
+            {{ feed_data.label }}
+        </h2>
+        
+        {% if feed_data.error %}
+        <div class="glass-card error-card">
+            <strong>{% trans "Error" %}:</strong> {{ feed_data.error }}
+        </div>
+        {% endif %}
+        
+        {% if feed_data.titles %}
+        <ul class="article-list">
+            {% for item in feed_data.titles %}
+            <li class="article-item">
+                <h3 class="article-title">
+                    <a href="{{ item.link }}" target="_blank" rel="noopener noreferrer">
+                        {{ item.title }}
+                    </a>
+                </h3>
+                {% if item.date %}
+                <p class="article-date">
+                    {{ item.date|date:"F d, Y g:i A" }}
+                </p>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="no-articles">{% trans "No articles found." %}</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+<div class="glass-card rss-info">
+    <p class="rss-text">
+        <strong>{% trans "RSS Feeds" %}:</strong><br>
+        • <a href="https://www.lemonde.fr/rss/une.xml" target="_blank" class="link-accent">Actualités</a><br>
+        • <a href="https://www.lemonde.fr/economie/rss_full.xml" target="_blank" class="link-accent">Économie</a><br>
+        • <a href="https://www.lemonde.fr/culture/rss_full.xml" target="_blank" class="link-accent">Culture</a><br>
+        • <a href="https://www.lemonde.fr/idees/rss_full.xml" target="_blank" class="link-accent">Idées</a>
+    </p>
+</div>
+{% endblock %}

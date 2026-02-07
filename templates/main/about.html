@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "About" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}{% trans "About This Project" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "A Django web application project. Django is a high-level Python web framework that encourages rapid development and clean, pragmatic design." %}</p>
+</div>
+
+<div class="glass-card feature-card">
+    <h2 class="section-title">{% trans "Features" %}</h2>
+    <ul class="feature-list">
+        <li>{% trans "Modern, responsive UI design" %}</li>
+        <li>{% trans "Clean project structure" %}</li>
+        <li>{% trans "Ready for development" %}</li>
+        <li>{% trans "SQLite database configured" %}</li>
+        <li>{% trans "Admin panel available" %}</li>
+    </ul>
+</div>
+
+<div class="glass-card tech-card">
+    <h2 class="section-title">{% trans "Technology Stack" %}</h2>
+    <p>{% trans "This project uses:" %}</p>
+    <ul class="tech-list">
+        <li><strong>Django</strong> - {% trans "Web framework" %}</li>
+        <li><strong>Python</strong> - {% trans "Programming language" %}</li>
+        <li><strong>Google Gemini AI</strong> - {% trans "AI translation service" %}</li>
+        <li><strong>SQLite</strong> - {% trans "Database (default)" %}</li>
+        <li><strong>HTML/CSS</strong> - {% trans "Frontend" %}</li>
+    </ul>
+</div>
+
+<div class="action-buttons">
+    <a href="{% url 'index' %}" class="btn btn-primary">{% trans "Back to Home" %}</a>
+</div>
+{% endblock %}

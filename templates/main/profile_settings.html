@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Profile Settings" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}⚙️ {% trans "Profile Settings" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "Update your profile information, avatar, and language preferences." %}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="auth-container">
+    <div class="glass-card auth-card">
+        <form method="post" action="{% url 'profile_settings' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="messages">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <div class="message error">{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <div class="message error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Current Avatar Display -->
+            {% if profile.avatar %}
+            <div class="form-group" style="text-align: center; margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 12px;">{% trans "Current Profile Picture" %}</label>
+                <img src="{{ profile.avatar.url }}" alt="Profile Picture" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(20, 184, 166, 0.3);">
+            </div>
+            {% endif %}
+            
+            <!-- Avatar Upload -->
+            <div class="form-group">
+                <label for="{{ form.avatar.id_for_label }}">{% trans "Profile Picture" %}</label>
+                {{ form.avatar }}
+                {% if form.avatar.help_text %}
+                <span class="help-text">{{ form.avatar.help_text }}</span>
+                {% endif %}
+                <small class="form-hint">{% trans "Upload a new profile picture (optional). Accepted formats: JPG, PNG, GIF." %}</small>
+            </div>
+            
+            <!-- Nickname -->
+            <div class="form-group">
+                <label for="{{ form.nickname.id_for_label }}">{% trans "Nickname" %} *</label>
+                {{ form.nickname }}
+                {% if form.nickname.help_text %}
+                <span class="help-text">{{ form.nickname.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <!-- Native Language -->
+            <div class="form-group">
+                <label for="{{ form.native_language.id_for_label }}">{% trans "Native Language" %} *</label>
+                {{ form.native_language }}
+                {% if form.native_language.help_text %}
+                <span class="help-text">{{ form.native_language.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <!-- Target Language -->
+            <div class="form-group">
+                <label for="{{ form.target_language.id_for_label }}">{% trans "Learning Language" %} *</label>
+                {{ form.target_language }}
+                {% if form.target_language.help_text %}
+                <span class="help-text">{{ form.target_language.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">{% trans "Save Changes" %}</button>
+        </form>
+        
+        <div class="auth-divider">
+            <p class="auth-link-text">
+                <a href="{% url 'index' %}" class="link-accent">{% trans "← Back to Home" %}</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

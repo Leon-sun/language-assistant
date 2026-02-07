@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark theme color tokens (shadcn-style) */
+    --background: 220 20% 8%; /* Dark navy background */
+    --foreground: 210 20% 85%; /* Light gray text */
+    --border: 215 20% 20%; /* Subtle border color */
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: 
+      radial-gradient(ellipse at top, rgba(16, 42, 67, 0.8) 0%, transparent 50%),
+      radial-gradient(ellipse at bottom, rgba(26, 26, 26, 0.8) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  }
+  
+  .glass-strong {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.5);
+  }
+  
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-teal-600;
+  }
+  
+  .accent-line {
+    @apply relative;
+  }
+  
+  .accent-line::after {
+    content: '';
+    @apply absolute bottom-0 left-0 h-0.5 w-full bg-gradient-to-r from-teal-400 to-teal-600;
+  }
+}

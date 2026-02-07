@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign Up" %} - {% trans "Dictionary Project" %}{% endblock %}
+{% block page_title %}{% trans "Sign Up" %}{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <p class="subtitle">{% trans "Create an account to save words to your personal dictionary." %}</p>
+</div>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+    <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="auth-container">
+    <div class="glass-card auth-card">
+        <form method="post" action="{% url 'account_signup' %}">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+            <div class="messages">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                    <div class="message error">{{ error }}</div>
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                <div class="message error">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">{% trans "Email" %} *</label>
+                {{ form.email }}
+                {% if form.email.help_text %}
+                <span class="help-text">{{ form.email.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.nickname.id_for_label }}">{% trans "Nickname" %} *</label>
+                {{ form.nickname }}
+                {% if form.nickname.help_text %}
+                <span class="help-text">{{ form.nickname.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.native_language.id_for_label }}">{% trans "Native Language" %} *</label>
+                {{ form.native_language }}
+                {% if form.native_language.help_text %}
+                <span class="help-text">{{ form.native_language.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.target_language.id_for_label }}">{% trans "Learning Language" %} *</label>
+                {{ form.target_language }}
+                {% if form.target_language.help_text %}
+                <span class="help-text">{{ form.target_language.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">{% trans "Password" %} *</label>
+                {{ form.password1 }}
+                {% if form.password1.help_text %}
+                <span class="help-text">{{ form.password1.help_text }}</span>
+                {% endif %}
+                <small class="form-hint">{% trans "Password must be at least 6 characters long." %}</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">{% trans "Password (again)" %} *</label>
+                {{ form.password2 }}
+                {% if form.password2.help_text %}
+                <span class="help-text">{{ form.password2.help_text }}</span>
+                {% endif %}
+            </div>
+            
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary btn-block">{% trans "Sign Up" %}</button>
+        </form>
+        
+        <div class="auth-divider">
+            <p class="auth-link-text">
+                {% trans "Already have an account?" %} <a href="{% url 'account_login' %}" class="link-accent">{% trans "Sign in" %}</a>
+            </p>
+        </div>
+        
+        {% load socialaccount %}
+        {% get_providers as socialaccount_providers %}
+        {% if socialaccount_providers %}
+        <div class="auth-divider">
+            <p class="auth-link-text">{% trans "Or sign up with" %}:</p>
+            <div class="social-buttons">
+                {% for provider in socialaccount_providers %}
+                    <a href="{% provider_login_url provider.id process='signup' %}" class="btn btn-social">
+                        <span>🔵</span> {{ provider.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
