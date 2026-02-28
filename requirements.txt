@@ -15,4 +15,5 @@ google-ai-generativelanguage
 google-api-core
 google-auth
 feedparser==6.0.12
+whitenoise==6.11.0
 
