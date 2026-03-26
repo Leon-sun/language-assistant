@@ -10,3 +10,4 @@ requests==2.32.3
 cryptography==42.0.8
 feedparser==6.0.12
 google-genai
+Pillow==10.4.0
