@@ -400,4 +400,5 @@ Exigences:
         logger.error(f"Error generating weather phrase: {str(e)}")
         return f"Météo d'aujourd'hui: {weather_description} à {temperature}°C. Les sautes d'humeur de Mère Nature continuent!"
 
-
+import os
+print("DEBUG GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
