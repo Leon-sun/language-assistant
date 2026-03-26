@@ -121,13 +121,11 @@ class CustomLoginForm(LoginForm):
             except UserProfile.DoesNotExist:
                 # If nickname not found, try as email for backward compatibility
                 # or raise validation error
-                try:
-                    User.objects.get(email__iexact=nickname)
+                if User.objects.filter(email__iexact=nickname).exists():
                     return nickname  # It's an email, use it directly
-                except User.DoesNotExist:
-                    raise forms.ValidationError(
-                        "No account found with this nickname."
-                    )
+                raise forms.ValidationError(
+                    "No account found with this nickname."
+                )
         
         return nickname
 

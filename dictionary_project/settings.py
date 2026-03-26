@@ -172,13 +172,20 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# WhiteNoise configuration for production (Django 4.2+ / 5+ / 6+)
+# WhiteNoise configuration
+# Manifest mode should be explicitly enabled in production after collectstatic.
+USE_MANIFEST_STATICFILES = os.getenv('USE_MANIFEST_STATICFILES', 'False').lower() in ('true', '1', 'yes')
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # Use non-manifest storage unless explicitly enabled.
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
+            if USE_MANIFEST_STATICFILES
+            else "whitenoise.storage.CompressedStaticFilesStorage"
+        ),
     },
 }
 
