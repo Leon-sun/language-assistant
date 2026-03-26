@@ -401,4 +401,5 @@ Exigences:
         return f"Météo d'aujourd'hui: {weather_description} à {temperature}°C. Les sautes d'humeur de Mère Nature continuent!"
 
 import os
-print("DEBUG GEMINI_API_KEY:", os.getenv("GEMINI_API_KEY"))
+print("DEBUG GEMINI_API_KEY exists:", bool(os.getenv("GEMINI_API_KEY")))
+print("DEBUG GEMINI_API_KEY length:", len(os.getenv("GEMINI_API_KEY", "")))
