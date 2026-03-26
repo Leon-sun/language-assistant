@@ -403,3 +403,4 @@ Exigences:
 import os
 print("DEBUG GEMINI_API_KEY exists:", bool(os.getenv("GEMINI_API_KEY")))
 print("DEBUG GEMINI_API_KEY length:", len(os.getenv("GEMINI_API_KEY", "")))
+print("ALL ENV:", os.environ)
