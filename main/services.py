@@ -16,8 +16,7 @@ def get_gemini_client():
     api_key = os.getenv('GEMINI_API_KEY') or getattr(settings, 'GEMINI_API_KEY', None)
     if not api_key:
         raise ValueError("GEMINI_API_KEY not found. Please set it in environment variables or settings.")
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel('models/gemini-2.5-flash')
+    return genai.Client(api_key=api_key)
 
 
 def build_personalized_prompt(word, user_profile=None):
@@ -170,7 +169,7 @@ def lookup_word(word, user_profile=None):
         ValueError: If API call fails or JSON parsing fails
     """
     try:
-        model = get_gemini_client()
+        client = get_gemini_client()
         
         # Build personalized prompt
         prompt, config_snapshot = build_personalized_prompt(word, user_profile)
@@ -181,25 +180,27 @@ def lookup_word(word, user_profile=None):
         
         # Generate content using Gemini with JSON response type
         try:
-            response = model.generate_content(
-                prompt,
-                generation_config={
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config={
                     "temperature": 0.3,  # Lower temperature for more consistent JSON
                     "top_p": 0.8,
                     "top_k": 40,
                     "response_mime_type": "application/json",  # Request JSON directly
-                }
+                },
             )
         except Exception as api_error:
             # Fallback if JSON mime type is not supported
             logger.warning(f"JSON mime type not supported, falling back to text: {str(api_error)}")
-            response = model.generate_content(
-                prompt,
-                generation_config={
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config={
                     "temperature": 0.3,
                     "top_p": 0.8,
                     "top_k": 40,
-                }
+                },
             )
         
         # Extract the response content
@@ -360,7 +361,7 @@ def generate_weather_phrase(temperature, weather_description, wind_speed=None):
         str: Satirical weather phrase in French (max 30 words)
     """
     try:
-        model = get_gemini_client()
+        client = get_gemini_client()
         
         prompt = f"""Écris une phrase amusante et satirique sur la météo EN FRANÇAIS. 
         
@@ -378,13 +379,14 @@ Exigences:
 
 Écris UNIQUEMENT la phrase, pas d'explications ni de texte supplémentaire."""
 
-        response = model.generate_content(
-            prompt,
-            generation_config={
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+            config={
                 "temperature": 0.8,  # Higher temperature for more creative responses
                 "top_p": 0.9,
                 "top_k": 40,
-            }
+            },
         )
         
         phrase = (response.text or "").strip()
@@ -399,8 +401,3 @@ Exigences:
     except Exception as e:
         logger.error(f"Error generating weather phrase: {str(e)}")
         return f"Météo d'aujourd'hui: {weather_description} à {temperature}°C. Les sautes d'humeur de Mère Nature continuent!"
-
-import os
-print("DEBUG GEMINI_API_KEY exists:", bool(os.getenv("GEMINI_API_KEY")))
-print("DEBUG GEMINI_API_KEY length:", len(os.getenv("GEMINI_API_KEY", "")))
-print("ALL ENV:", os.environ)
