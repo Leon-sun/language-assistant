@@ -23,10 +23,21 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h.strip()]
+def _parse_csv_env(name, default=''):
+    raw = os.getenv(name, default)
+    return [item.strip() for item in raw.split(',') if item and item.strip()]
 
-# CSRF trusted origins for Railway
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if os.getenv('CSRF_TRUSTED_ORIGINS') else []
+
+ALLOWED_HOSTS = _parse_csv_env('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+railway_public_domain = os.getenv('RAILWAY_PUBLIC_DOMAIN', '').strip()
+if railway_public_domain and railway_public_domain not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(railway_public_domain)
+
+# CSRF trusted origins for Railway (expects full origins like https://example.com)
+CSRF_TRUSTED_ORIGINS = [origin.rstrip('/') for origin in _parse_csv_env('CSRF_TRUSTED_ORIGINS')]
+
+# Railway runs behind a reverse proxy; trust forwarded HTTPS header.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition

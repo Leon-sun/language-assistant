@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/jamie/Dictionary%20Project/dictionary-ui/src/app/page.tsx"],"sourcesContent":["\"use client\";\n\nimport { useEffect } from \"react\";\n\nconst DJANGO_APP_URL =\n  process.env.NEXT_PUBLIC_DJANGO_APP_URL || \"http://localhost:8000\";\n\nexport default function HomePage() {\n  useEffect(() => {\n    window.location.href = DJANGO_APP_URL;\n  }, []);\n\n  return (\n    <div className=\"flex min-h-[60vh] flex-col items-center justify-center gap-4 text-zinc-400\">\n      <p className=\"text-sm\">Redirecting to the original frontend…</p>\n      <a\n        href={DJANGO_APP_URL}\n        className=\"text-sm text-zinc-300 underline hover:text-zinc-100\"\n      >\n        Click here if you are not redirected\n      </a>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAFA;;;AAIA,MAAM,iBACJ,QAAQ,GAAG,CAAC,0BAA0B,IAAI;AAE7B,SAAS;IACtB,IAAA,kNAAS,EAAC;QACR,OAAO,QAAQ,CAAC,IAAI,GAAG;IACzB,GAAG,EAAE;IAEL,qBACE,8OAAC;QAAI,WAAU;;0BACb,8OAAC;gBAAE,WAAU;0BAAU;;;;;;0BACvB,8OAAC;gBACC,MAAM;gBACN,WAAU;0BACX;;;;;;;;;;;;AAKP","debugId":null}}]
-}
